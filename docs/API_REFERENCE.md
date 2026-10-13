@@ -1,7 +1,7 @@
 # libzune API reference
 
-Current public interface: **97 functions** in [include/zune.h](../include/zune.h).
-The base review is October 4, 2026, with podcast contracts updated October 9.
+Current public interface: **105 functions** in [include/zune.h](../include/zune.h).
+The base review is October 4, 2026, with spoken-media contracts reviewed October 13.
 The exact declarations below are generated; [TOC.md](TOC.md) links each one to
 its implementation. Build and platform requirements are in [README](../README.md).
 
@@ -26,7 +26,7 @@ strings) use `free`. Prepared-media paths require both `unlink` and `free`.
 
 **Scan cache lifetime:** a successful `zune_infiltrate` stores a borrowed pointer
 to the returned scan in the device. Keep that scan alive for the scan-based music `zune_find_*`
-calls. `zune_find_podcast_episode` and `zune_find_audiobook_part` instead query live MTP state and requires
+calls. `zune_find_podcast_episode` and `zune_find_audiobook_part` instead query live MTP state and require
 no ZMDB scan. `zune_free_scan` does not clear the device pointer. After freeing it, do
 not call a scan-based find helper until another successful scan replaces the cache. A
 failed scan does not replace it. The simplest lifetime is scan, search/use,
@@ -44,9 +44,11 @@ Most mutation functions return 0 for success and -1 for failure, but this is
   Both podcast mutation APIs return `ZUNE_PODCAST_FAILED_CLEANED` (-2) only
   after confirmed deletion of their new object; other failures return -1.
   A zero ID on its own never proves cleanup.
-- `zune_get_folders` returns a count or -1. Other enumeration functions return
-  an allocated array and count; NULL with zero count can mean empty or failure.
-  Some enumeration paths skip unreadable records, so results may be partial.
+- `zune_get_folders` returns a count or -1. Legacy music/video/photo/playlist
+  enumeration can return NULL for empty or failure and may skip unreadable rows.
+  Spoken inventories, source maps and listening-state APIs instead return 0 for
+  complete success (including known empty) or -1 with NULL/count zero on failure.
+  They do not return a partial result. Use each function’s documented contract.
 - Boolean helpers and `zune_decode_filename` return 1/0.
 - `zune_smuggle_video_named` returns 1 (`ZUNE_VIDEO_METADATA_INCOMPLETE`) when
   media is uploaded but requested metadata/art was not fully saved. Its returned

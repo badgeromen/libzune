@@ -16,6 +16,7 @@ complete public signatures and their contracts.
 ## Start here
 
 - [README](../README.md): build, integration and the Rebellion API.
+- [Buildable examples](../examples/README.md): standalone public-API clients and software-only checks.
 - [API reference](API_REFERENCE.md): every public signature, ownership, status codes and implementation limits.
 - [Public authentication setup](PUBLIC_CREDENTIALS.md): embedded-header and external-file behavior.
 - [Wire capture findings](WIRE_CAPTURE_FINDINGS.md): observed Windows-client protocol behavior.
@@ -653,6 +654,15 @@ See [PUBLIC_CREDENTIALS.md](PUBLIC_CREDENTIALS.md) for the runtime override.
 | [src/zmdb_io.c](../src/zmdb_io.c) | 127 |
 | [src/zune_internal.h](../src/zune_internal.h) | 122 |
 
+## Integration examples
+
+- [examples/README.md](../examples/README.md)
+- [examples/audiobook_send.c](../examples/audiobook_send.c)
+- [examples/common.h](../examples/common.h)
+- [examples/device_info.c](../examples/device_info.c)
+- [examples/podcast_send.c](../examples/podcast_send.c)
+- [examples/spoken_inventory.c](../examples/spoken_inventory.c)
+
 ## Tools and regression tests
 
 These are development tools, not additional library API. Software tests do not
@@ -717,6 +727,41 @@ replace device authentication, transfer and readback tests on real hardware.
   - `__wrap_mtp_get_object_handles()`: [tests/audiobook_gate.c:28](../tests/audiobook_gate.c#L28)
   - `check()`: [tests/audiobook_gate.c:40](../tests/audiobook_gate.c#L40)
   - `main()`: [tests/audiobook_gate.c:47](../tests/audiobook_gate.c#L47)
+- [tests/examples.c](../tests/examples.c)
+  - `check()`: [tests/examples.c:28](../tests/examples.c#L28)
+  - `reset()`: [tests/examples.c:34](../tests/examples.c#L34)
+  - `run()`: [tests/examples.c:35](../tests/examples.c#L35)
+  - `writes()`: [tests/examples.c:52](../tests/examples.c#L52)
+  - `owned()`: [tests/examples.c:53](../tests/examples.c#L53)
+  - `read_failed()`: [tests/examples.c:57](../tests/examples.c#L57)
+  - `write_file()`: [tests/examples.c:58](../tests/examples.c#L58)
+  - `zune_breach()`: [tests/examples.c:63](../tests/examples.c#L63)
+  - `zune_sever()`: [tests/examples.c:64](../tests/examples.c#L64)
+  - `zune_get_name()`: [tests/examples.c:65](../tests/examples.c#L65)
+  - `zune_get_model()`: [tests/examples.c:66](../tests/examples.c#L66)
+  - `zune_get_serial()`: [tests/examples.c:67](../tests/examples.c#L67)
+  - `zune_get_battery()`: [tests/examples.c:68](../tests/examples.c#L68)
+  - `zune_get_error()`: [tests/examples.c:69](../tests/examples.c#L69)
+  - `zune_autopsy()`: [tests/examples.c:70](../tests/examples.c#L70)
+  - `zune_get_podcast_series()`: [tests/examples.c:71](../tests/examples.c#L71)
+  - `zune_free_podcast_series()`: [tests/examples.c:80](../tests/examples.c#L80)
+  - `zune_get_podcast_episodes()`: [tests/examples.c:86](../tests/examples.c#L86)
+  - `zune_free_podcast_episodes()`: [tests/examples.c:95](../tests/examples.c#L95)
+  - `zune_get_audiobook_parts()`: [tests/examples.c:101](../tests/examples.c#L101)
+  - `zune_free_audiobook_parts()`: [tests/examples.c:112](../tests/examples.c#L112)
+  - `zune_get_podcast_states()`: [tests/examples.c:118](../tests/examples.c#L118)
+  - `zune_free_podcast_states()`: [tests/examples.c:129](../tests/examples.c#L129)
+  - `zune_get_podcast_episode_sources()`: [tests/examples.c:135](../tests/examples.c#L135)
+  - `zune_free_podcast_episode_sources()`: [tests/examples.c:144](../tests/examples.c#L144)
+  - `zune_find_podcast_episode()`: [tests/examples.c:150](../tests/examples.c#L150)
+  - `zune_forge_folder()`: [tests/examples.c:159](../tests/examples.c#L159)
+  - `zune_forge_podcast_series()`: [tests/examples.c:163](../tests/examples.c#L163)
+  - `zune_smuggle_podcast_episode()`: [tests/examples.c:169](../tests/examples.c#L169)
+  - `zune_find_audiobook_part()`: [tests/examples.c:176](../tests/examples.c#L176)
+  - `zune_smuggle_audiobook_part()`: [tests/examples.c:183](../tests/examples.c#L183)
+  - `zune_brand()`: [tests/examples.c:191](../tests/examples.c#L191)
+  - `zune_finalize()`: [tests/examples.c:196](../tests/examples.c#L196)
+  - `main()`: [tests/examples.c:198](../tests/examples.c#L198)
 - [tests/media_capabilities.c](../tests/media_capabilities.c)
   - `ptp_transaction()`: [tests/media_capabilities.c:12](../tests/media_capabilities.c#L12)
   - `check()`: [tests/media_capabilities.c:55](../tests/media_capabilities.c#L55)
@@ -759,6 +804,7 @@ replace device authentication, transfer and readback tests on real hardware.
   - `main()`: [tests/podcasts.c:121](../tests/podcasts.c#L121)
 - [tests/run-artist-reuse.sh](../tests/run-artist-reuse.sh)
 - [tests/run-audiobook-gate.sh](../tests/run-audiobook-gate.sh)
+- [tests/run-examples.sh](../tests/run-examples.sh)
 - [tests/run-media-capabilities.sh](../tests/run-media-capabilities.sh)
 - [tests/run-metadata-probe.sh](../tests/run-metadata-probe.sh)
 - [tests/run-podcast-state.sh](../tests/run-podcast-state.sh)

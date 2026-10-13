@@ -9,6 +9,9 @@ obj/
 *.so
 *.dylib
 
+# Compiled integration examples
+/examples/bin/
+
 /src/mtpz_keys.h
 .mtpz-data
 *.pem

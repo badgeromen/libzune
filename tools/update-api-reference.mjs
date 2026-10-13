@@ -123,7 +123,9 @@ const target = path.join(root, 'docs/API_REFERENCE.md');
 const existing = fs.readFileSync(target, 'utf8');
 const marker = '<!-- GENERATED API START -->';
 if (!existing.includes(marker)) throw Error('Missing API generation marker');
-let result = existing.split(marker)[0] + marker + '\n\n## Complete function reference\n\n';
+const intro = existing.split(marker)[0].replace(/Current public interface: \*\*\d+ functions\*\*/,
+    `Current public interface: **${declarations.length} functions**`);
+let result = intro + marker + '\n\n## Complete function reference\n\n';
 result += `${declarations.length} declarations, in public-header order.\n\n`;
 for (const match of declarations) {
     const signature = header.slice(match.index, match.index + match[0].length).trim();

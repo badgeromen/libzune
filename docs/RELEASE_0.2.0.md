@@ -22,7 +22,11 @@ are tracked separately; this document does not certify a packaged build.
 The [API reference](API_REFERENCE.md) covers all 105 public functions. The
 [integration guide](SPOKEN_MEDIA.md) explains identities, artwork placement,
 return values, ownership and serialized device access. The
-[source index](TOC.md) maps declarations to implementations.
+[source index](TOC.md) maps declarations to implementations. The new
+[buildable C examples](../examples/README.md) demonstrate standalone read-only
+inventory and prepared podcast/audiobook uploads using the public API. They do
+not require the Zuuned application and keep conversion, feeds and playback
+policy outside the device library.
 
 ## Evidence and limitations
 
