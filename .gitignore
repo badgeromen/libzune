@@ -9,6 +9,7 @@ obj/
 *.so
 *.dylib
 
-# Locally supplied MTPZ data
 /src/mtpz_keys.h
 .mtpz-data
+*.pem
+*.key
