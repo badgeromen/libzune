@@ -35,7 +35,11 @@ current header and index when integrating the library.
 Podcast integration, artwork placement, exact identity, CLI testing and current
 audiobook limits are in the [spoken-media guide](docs/SPOKEN_MEDIA.md). Podcast
 audio and visible covers are confirmed on the tested Classic; experimental
-native multipart audiobook transfer is now available on Zune 30 and HD. Podcast firmware played-state reads are available for both families.
+native multipart audiobook transfer is now available on Zune 30, 80/120 and HD.
+Podcast firmware played-state reads are available for those families too. Draco
+(Zune 80/120) passed a small audiobook audio/art roundtrip and a read-only,
+identity-matched podcast-state baseline. Completed-playback cleanup and corrected
+Draco podcast playback/artwork acceptance remain hardware gates.
 Audiobook resume, long-book transitions and other models remain separate gates.
 Chaptered-file preparation belongs to the application, not libzune. See the
 [0.2.0 release notes](docs/RELEASE_0.2.0.md) for this prerelease’s scope.

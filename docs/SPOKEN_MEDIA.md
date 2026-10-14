@@ -1,6 +1,6 @@
 # Podcasts and audiobooks: integration guide
 
-Status: 0.2.0 prerelease preparation, October 13, 2026. These experimental
+Status: 0.2.0 prerelease preparation, updated October 14, 2026. These experimental
 interfaces are present in this source revision. See the
 [API reference](API_REFERENCE.md) for signatures and
 [research record](SPOKEN_MEDIA_RESEARCH.md) for evidence and model limits.
@@ -27,11 +27,11 @@ not a converted file. The library does not inspect the codec in these send APIs.
 | Podcast show inventory, creation and exact-feed reuse | Implemented in libzune; tested on Classic / Keel |
 | Prepared MP3 episode upload, identity lookup and repeat reuse | Implemented; hardware upload, extraction and repeat admission tested |
 | Podcast show covers | `zune_brand` on the series ID; user confirmed visible artwork and audio playback on the tested Classic |
-| Podcast firmware listening-state reads | `zune_get_podcast_states` exposes bookmark and marked-played state on Keel/Pavo; saved-state and read-only device evidence are documented below |
+| Podcast firmware listening-state reads | `zune_get_podcast_states` exposes bookmark and marked-played state on Keel/Draco/Pavo; saved-state and read-only device evidence are documented below |
 | Podcast cleanup policy | Implemented by the app, using exact source/state correlation and explicit Sync; the library never deletes merely because state was read |
 | Device resume control | No podcast/audiobook bookmark-writing API; firmware resume and replay semantics remain separate gates |
 | Video podcasts | Not implemented by the podcast sender |
-| Native multipart audiobook transfer | Experimental lookup/send APIs for Keel and Pavo; two-part audio/art readback passed, user accepted Classic test. Resume and long books remain unverified |
+| Native multipart audiobook transfer | Experimental lookup/send APIs for Keel, Pavo and Draco; two-part audio/art readback passed, user accepted Classic test. Resume and long books remain unverified |
 | Local audiobook import, chapters, covers and playback | Implemented in Zuuned's app services, outside libzune |
 | HD artist backgrounds | Deferred; different from podcast or book cover images |
 
@@ -51,11 +51,15 @@ Podcast inventory, lookup and write APIs explicitly reject such sessions. A
 failed query must not be interpreted as an empty library. Authentication setup
 is described in [BUILD_WITH_MTPZ.md](BUILD_WITH_MTPZ.md).
 
-Native episode/book inventories, bulk podcast source maps, podcast listening
-state and audiobook lookup/send currently require Keel or Pavo. Podcast series
-inventory/creation and single-episode lookup/send instead use live property
-checks, with observed native normalization limited to Keel/Pavo. Passing those
-checks on another family is not hardware validation for that model.
+Podcast episode inventory and bulk source maps accept Keel, Pavo and Draco.
+Audiobook inventory/lookup/send also accept Draco following the October 13
+small multipart roundtrip. Podcast listening state accepts Keel/Draco v2 and
+Pavo v5. Podcast series inventory/creation and single-episode lookup/send use
+live property checks, with observed native normalization on Keel/Pavo/Draco.
+The Draco podcast normalization correction follows the October 13 Zune 120
+failure readback; corrected podcast transfer, playback and artwork still need
+a physical retest. This is separate from the successful Draco audiobook
+roundtrip and read-only podcast-state baseline.
 
 ## Read the podcast library
 
@@ -103,7 +107,7 @@ failure returns no partial inventory.
 `zune_get_podcast_episodes(dev, &episodes, &count)` returns owned
 `ZunePodcastEpisode` rows; `zune_get_audiobook_parts(dev, &parts, &count)` returns
 owned `ZuneAudiobookPart` rows. Both require authenticated serialized device
-ownership and currently accept Keel and Pavo only. Unsupported models fail
+ownership. Podcasts accept Keel, Pavo and Draco; audiobook inventory accepts those same families. Unsupported models fail
 explicitly rather than reporting an empty library.
 
 Both APIs read the complete wildcard handle inventory, then select native
@@ -210,12 +214,13 @@ response can leave uncertain state even when no ID was returned. Folder creation
 is a separate caller-owned operation; the APIs do not remove its parent folder.
 Inspect `zune_get_error()` and `zune_autopsy()` immediately after a failure.
 
-On Keel and Pavo, native audio episodes use atom schema `0x10`; MetaGenre may read
+On Keel, Pavo and Draco, native audio episodes use atom schema `0x10`; MetaGenre may read
 back as zero and the redundant series-name field as empty. The implementation
 still checks the actual series link, source URL, title, format and size. Keep
 these model-specific readback rules; do not extend that normalization exception
 to unknown families or non-podcast schemas. Pavo normalization was observed in the October 9 GUI failure;
-HD playback/artwork acceptance still needs a new test.
+Draco normalization was observed in the October 13 Zune 120 GUI failure.
+Corrected Draco transfer/playback/artwork acceptance still needs a new test.
 
 ## Command-line testing
 
@@ -266,7 +271,7 @@ node tools/update-toc.mjs --check
 sends an immutable, caller-prepared MP3, creating identity folders below OverDrive
 as needed. Neither creates music albums/artists or writes object references.
 Both require serialized, authenticated ownership and currently admit only tested
-Keel (Zune 30) and Pavo (HD) families.
+Keel (Zune 30), Pavo (HD) and Draco (Zune 80/120) families.
 
 Populate `ZuneAudiobookPartInput` with a 64-character lowercase SHA-256 book key,
 nonempty book title and part title, a non-NULL author (the empty string is
@@ -372,7 +377,9 @@ and [dated source evidence](SPOKEN_MEDIA_RESEARCH.md#native-audiobook-lead-recov
 ## Persisted podcast listening state
 
 `zune_get_podcast_states(device, &states, &count)` reads a fresh, complete ZMDB
-snapshot on authenticated Keel (Classic Zune 30) and Pavo (Zune HD) sessions.
+snapshot on authenticated Keel (Zune 30), Draco (Zune 80/120) and Pavo (Zune HD)
+sessions. Keel/Draco require Classic v2; Pavo requires HD v5. A mismatched
+model/version fails explicitly.
 Serialize this call with every other device operation. Use
 `zune_free_podcast_states(states, count)` to release the result.
 
@@ -414,7 +421,9 @@ are offline reads of saved evidence, not new USB operations or deletion tests.
 `item_id`, `series_id`, `parent_id`, `feed_url` and `source_url` mapping for
 cleanup. Free owned strings and the array with
 `zune_free_podcast_episode_sources(sources, count)`. Its authenticated active
-Keel/Pavo and complete-success/explicit-failure contract matches listening state.
+Keel/Pavo/Draco inventory uses a complete-success/explicit-failure contract.
+Source membership alone never authorizes played-episode removal; join the
+complete live state and identity inventories before applying retention policy.
 It reads series once and each distinct series folder's MP3 inventory once,
 regardless of how many local episodes the application follows. The caller joins
 local feed/source identities in memory instead of repeating USB searches per
@@ -431,3 +440,31 @@ hardware deletion is implied by this software gate.
 
 October 10: the Classic title-derived filename correction and its isolated
 hardware verification are documented in [the research record](SPOKEN_MEDIA_RESEARCH.md#keel-title-derived-podcast-filename-2026-10-10).
+
+
+### Zune 80/120 audiobook support, October 13
+
+Draco audiobook inventory, exact lookup and prepared-MP3 sends now use the same
+native schema `0x12` path as the Zune 30 and HD. An isolated physical Zune 120
+roundtrip passed two 45-second chapters with exact metadata, audio and cover
+readback, preserved existing objects and removed only its newly created test
+objects. [Evidence](../tests/fixtures/spoken-media/draco-audiobook-roundtrip.txt).
+Full-length user books, device-screen playback and resume remain separate checks.
+The subsequent listening-state correction below is independently validated;
+audiobook success alone does not authorize podcast deletion.
+
+
+### Zune 80/120 listening-state correction, October 13
+
+The live Zune 120 returned Classic v2 state for 15 podcasts. Every item, series,
+title and duration matched the independent MTP inventory and exact feed/source
+map. All 15 were unplayed in this snapshot. The previous family guard wrongly
+excluded Draco and would also have selected v5 if only its allowlist was changed.
+Both checks now match the documented Classic layout.
+
+The parser and played mask `0x200` are unchanged. Native software gates exercise
+Keel v2, Draco v2 and Pavo v5, reject every wrong family/version combination, and
+preserve failure on incomplete data. Saved physical Zune 30 and HD captures still
+parse, including their previously observed played and partial-playback states.
+User testing of a completed episode followed by cleanup on Draco remains pending;
+the read-only baseline did not delete or modify media. See the [research record](SPOKEN_MEDIA_RESEARCH.md#draco-podcast-listening-state-2026-10-13).
